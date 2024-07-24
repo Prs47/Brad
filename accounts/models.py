@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Create your models here.
 
@@ -23,3 +25,8 @@ class Experience(models.Model):
     start = models.DateField()
     end = models.DateField(null=True)
     description = models.TextField()
+    
+@receiver(post_save, sender=User, dispatch_uid="create_user_profile")
+def create_userprofile(sender, instance, **kwargs):
+    if UserProfile.objects.filter(user=instance).count() == 0:
+        UserProfile.objects.create(User=instance)
